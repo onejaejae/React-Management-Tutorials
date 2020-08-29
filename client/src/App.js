@@ -34,9 +34,9 @@ class App extends React.Component {
 
 componentDidMount(){
   this.timer = setInterval(this.progress, 20);
-  // this.callApi()
-  //   .then(data => this.setState({customers : data}))
-  //   .catch(err => console.log(err));
+  this.callApi()
+    .then(data => this.setState({customers : data}))
+    .catch(err => console.log(err));
 }
 
 callApi = async () => {
