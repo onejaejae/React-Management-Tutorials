@@ -16,7 +16,7 @@ class CustomerAdd extends React.Component{
         this.addCustomer()
             .then((response) => {
                 console.log(response.data);
-                this.props.stateRefresh();
+                this.props.stateRefresh(); // 비동기적으로 처리되기 때문에 데이터를 보낸 뒤 stateRefresh()를 실행해야 한다.
             });
         this.setState({
             file : null,

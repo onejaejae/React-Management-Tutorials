@@ -24,7 +24,7 @@ let multer = require('multer'); //multer 라이브러리는 프론트로부터 �
 let upload = multer({dest : './upload'});
 
 app.get('/api/customers', (req, res)=>{ 
-   connection.query('SELECT * FROM management', (err, customers) => {
+   connection.query('SELECT * FROM management WHERE isDeleted=0', (err, customers) => { // 삭제되지 않은 것만 가져와야 하기 때문에 isDeleted가 0인 것만 가져온다
      if(err){
        throw err;
      } 
@@ -42,13 +42,23 @@ app.use('/image', express.static('./upload')); // 가상 경로를 사용한 경
 app.post('/api/customers', upload.single('image'), (req, res) => { 
   const body = req.body;
   let image = '/image/' + req.file.filename;
-  connection.query(`INSERT INTO management (image, name, birthday, gender, job) VALUES (?, ?, ?, ?, ?)`, [image, body.name, body.birthday, body.gender, body.job], (err, customers) => {
+  connection.query(`INSERT INTO management (image, name, birthday, gender, job, createDate, isDeleted) VALUES (?, ?, ?, ?, ?, now(), 0)`, [image, body.name, body.birthday, body.gender, body.job], (err, customers) => {
     if(err){
       throw err;
     }
     res.send(customers);  
   })
 })  
+
+app.delete('/api/customers/:id', (req, res) => {
+  let id = req.params.id;
+  connection.query(`UPDATE management SET isDeleted = 1 WHERE ID = ?`, [ id ], (err, data) => {
+    if(err){
+      throw err;
+    }
+    res.send(data);
+  })
+})
 
 app.listen(port, ()=>{
     console.log(`Listening on port ${port}`)
