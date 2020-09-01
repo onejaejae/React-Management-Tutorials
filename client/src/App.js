@@ -9,6 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import { withStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import CustomerAdd from './components/CustomerAdd';
 
 const styles = theme => ({
   root : {
@@ -30,6 +31,16 @@ class App extends React.Component {
   state = {
     customers : "",
     completed : 0
+  }
+
+  stateRefresh = () => {
+    this.setState({
+      customers : "",
+      completed : 0
+    })
+    this.callApi()
+    .then(data => this.setState({customers : data}))
+    .catch(err => console.log(err));
   }
 
 componentDidMount(){
@@ -54,39 +65,42 @@ progress = () => {
     const { classes } = this.props;
     const { customers } = this.state;
     return ( 
-      <Paper className={classes.root}>
-        <Table className={classes.table}>
-          <TableHead>
-            <TableRow>
-              <TableCell>번호</TableCell>
-              <TableCell>이미지</TableCell>
-              <TableCell>이름</TableCell>
-              <TableCell>생년월일</TableCell>
-              <TableCell>성별</TableCell>
-              <TableCell>직업</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-                {customers ? customers.map(customer =>   //async 이기 때문에 customers가 비어있을 수 있으므로 삼항연산자를 사용!
-                <Customer 
-                  key={customer.id}
-                  id={customer.id}
-                  image={customer.image}
-                  name={customer.name}
-                  birthday={customer.birthday}
-                  gender={customer.gender}
-                  job={customer.job}
-                />
-              ) : 
+      <div>
+        <Paper className={classes.root}>
+          <Table className={classes.table}>
+            <TableHead>
               <TableRow>
-                  <TableCell colSpan="6" align="center">
-                    <CircularProgress className={classes.progress} variant="determinate" value={this.state.completed}></CircularProgress>
-                  </TableCell>
+                <TableCell>번호</TableCell>
+                <TableCell>이미지</TableCell>
+                <TableCell>이름</TableCell>
+                <TableCell>생년월일</TableCell>
+                <TableCell>성별</TableCell>
+                <TableCell>직업</TableCell>
               </TableRow>
-              } 
-          </TableBody>
-        </Table>
-      </Paper>
+            </TableHead>
+            <TableBody>
+                  {customers ? customers.map(customer =>   //async 이기 때문에 customers가 비어있을 수 있으므로 삼항연산자를 사용!
+                  <Customer 
+                    key={customer.id}
+                    id={customer.id}
+                    image={customer.image}
+                    name={customer.name}
+                    birthday={customer.birthday}
+                    gender={customer.gender}
+                    job={customer.job}
+                  />
+                ) : 
+                <TableRow>
+                    <TableCell colSpan="6" align="center">
+                      <CircularProgress className={classes.progress} variant="determinate" value={this.state.completed}></CircularProgress>
+                    </TableCell>
+                </TableRow>
+                } 
+            </TableBody>
+          </Table>
+        </Paper>
+        <CustomerAdd stateRefresh={this.stateRefresh}/>
+      </div>
     )
   }
 
