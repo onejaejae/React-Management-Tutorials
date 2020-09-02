@@ -1,6 +1,19 @@
 import React from 'react';
 import { post } from 'axios';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import { withStyles } from '@material-ui/core/styles';
 
+
+const styles = theme => ({
+    hidden : {
+        display : 'none'
+    }
+});
 class CustomerAdd extends React.Component{
     state = {
         file : null,
@@ -8,23 +21,45 @@ class CustomerAdd extends React.Component{
         birthday : '',
         gender : '',
         job : '',
-        fileName : ''
+        fileName : '',
+        open : false
     }
 
-    handleFormSubmit = (e) => {
-        e.preventDefault();
-        this.addCustomer()
-            .then((response) => {
-                console.log(response.data);
-                this.props.stateRefresh(); // 비동기적으로 처리되기 때문에 데이터를 보낸 뒤 stateRefresh()를 실행해야 한다.
-            });
+    handleClickOpen = () => {
+        this.setState({
+            open : true
+        })
+    }
+
+    handleClose = () => {
         this.setState({
             file : null,
             userName : '',
             birthday : '',
             gender : '',
             job : '',
-            fileName : ''
+            fileName : '',
+            open : false
+        })
+    }
+
+    handleFormSubmit = (e) => {
+        e.preventDefault();
+
+        this.addCustomer()
+            .then((response) => {
+                console.log(response.data);
+                this.props.stateRefresh(); // 비동기적으로 처리되기 때문에 데이터를 보낸 뒤 stateRefresh()를 실행해야 한다.
+            });
+
+        this.setState({
+            file : null,
+            userName : '',
+            birthday : '', 
+            gender : '',
+            job : '',
+            fileName : '',
+            open : false
         })
 
     }
@@ -60,19 +95,40 @@ class CustomerAdd extends React.Component{
     }
 
     render(){
-        const {file, userName, birthday, gender, job, fileName} = this.state;
+        const {file, userName, birthday, gender, job, fileName, open} = this.state;
+        const { classes } = this.props;
         return (
-            <form onSubmit={this.handleFormSubmit}>
-                <h1>고객 추가</h1>
-                프로필 이미지 : <input type="file" name="file" file={file}  value={fileName} onChange={this.handleFileChange} /><br />
-                이름 : <input type="text" name="userName" value={userName}  onChange={this.handleValueChange} /><br />
-                생년월일 : <input type="text" name="birthday" file={birthday}  onChange={this.handleValueChange} /><br />
-                성별 : <input type="text" name="gender" file={gender}  onChange={this.handleValueChange} /><br />
-                직업 : <input type="text" name="job" file={job}  onChange={this.handleValueChange} /><br />
-                <button type="submit">추가하기</button>
-            </form>
+            <div>
+                <Button variant="contained" color="primary" onClick={this.handleClickOpen}>
+                    고객 추가하기
+                </Button>
+                <Dialog open={ open } onClose={this.handleClose}>
+                    <DialogTitle>고객 추가</DialogTitle>
+                    <DialogContent>
+                        <input type="file" className={ classes.hidden } accept="image/*" id="raised-button-file" file={file}  value={fileName} onChange={this.handleFileChange} />
+                        <label htmlFor="raised-button-file">
+                            <Button variant="contained" color="primary" component="span" name="file">
+                                {fileName === "" ? '프로필 이미지 선택' : fileName}
+                            </Button>
+                        </label>
+                        <br />
+                        <TextField type="text" label="이름" name="userName" value={userName}  onChange={this.handleValueChange} /><br />
+                        <TextField type="text" label="생년월일" name="birthday" file={birthday}  onChange={this.handleValueChange} /><br />
+                        <TextField type="text" label="성별" name="gender" file={gender}  onChange={this.handleValueChange} /><br />
+                        <TextField type="text" label="직업" name="job" file={job}  onChange={this.handleValueChange} /><br />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button variant="contained" color="primary" onClick={this.handleFormSubmit}>
+                            추가
+                        </Button>
+                        <Button variant="outlined" color="primary" onClick={this.handleClose}>
+                            닫기
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
         )
     }
 }
 
-export default CustomerAdd;
+export default withStyles(styles)(CustomerAdd);
